@@ -2,7 +2,9 @@
 
 An original, self-contained frontend repair demonstration. The brand, lamp, price and dimensions are fictional. The inline SVG is original artwork. This is a sample, not a client project, customer result or functioning shop.
 
-Open `index.html` in a browser. No installation, build, server or account is needed.
+**[Try the live Before / After demo](https://yueyue673.github.io/responsive-ticket-demo/)**
+
+You can also open `index.html` locally. No installation, build, server or account is needed.
 
 ![Rendered desktop layout](evidence/desktop-after.jpg)
 

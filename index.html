@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="An original, offline responsive layout demonstration with a reproducible mobile overflow bug and its fix. All product details are fictional.">
+  <title>Arc — a responsive layout study</title>
+  <style>
+    :root {
+      --ink: #252b23;
+      --muted: #62685c;
+      --paper: #f1f0e9;
+      --line: #d9dbd0;
+      --green: #384b36;
+      --warm: #c18865;
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    button, a { touch-action: manipulation; }
+    button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid #28624d;
+      outline-offset: 5px;
+    }
+    a { color: inherit; }
+    .skip-link {
+      position: fixed; top: 8px; left: 8px; z-index: 10;
+      padding: 12px 16px; background: #fff; transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .shell { width: min(1120px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; padding-block: 27px; border-bottom: 1px solid var(--line);
+    }
+    .signature { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .mark { width: 29px; height: 29px; flex: none; }
+    .signature strong { font-size: 15px; font-weight: 650; letter-spacing: .15em; }
+    .signature span { color: var(--muted); font-size: 11px; letter-spacing: .17em; }
+    .edition { color: var(--muted); font-size: 12px; letter-spacing: .04em; text-align: right; }
+    .study-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 28px;
+      padding-block: 30px 23px;
+    }
+    .eyebrow { margin: 0 0 8px; font-size: 10px; font-weight: 650; letter-spacing: .16em; text-transform: uppercase; }
+    .study-title { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -.035em; }
+    .study-title span { color: var(--muted); }
+    .switcher { display: flex; flex-shrink: 0; padding: 4px; gap: 4px; border: 1px solid #d3d6c9; border-radius: 40px; }
+    .mode-button {
+      min-height: 44px; min-width: 94px; padding: 10px 20px;
+      border: 0; border-radius: 32px; color: var(--muted); background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+    }
+    .mode-button[aria-pressed="true"] { background: var(--green); color: #fff; box-shadow: 0 2px 4px #1f30231a; }
+    .mode-button:hover:not([aria-pressed="true"]) { background: #e2e5d9; color: var(--ink); }
+    .viewport-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; font-size: 11px; color: var(--muted); }
+    .status { display: flex; align-items: center; gap: 7px; }
+    .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #63805c; flex: none; }
+    body[data-mode="before"] .status::before { background: #b16c40; }
+    .demo-stage {
+      overflow-x: auto; overscroll-behavior-x: contain;
+      border: 1px solid var(--line); border-radius: 5px; background: #fbfbf6;
+      scrollbar-color: #86927b #e4e7dd;
+    }
+    .product { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); width: 100%; }
+    .product > * { min-width: 0; }
+    .product-visual {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      min-height: 490px; padding: 36px; overflow: hidden;
+      background: #e5e7db;
+    }
+    .visual-label { position: absolute; top: 24px; left: 26px; z-index: 1; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #4d5c45; }
+    .visual-number { position: absolute; right: 24px; bottom: 22px; font-size: 10px; color: #62705a; letter-spacing: .1em; }
+    .lamp-art { display: block; width: 100%; max-width: 455px; height: auto; }
+    .product-copy { padding: 47px 46px 34px; display: flex; flex-direction: column; }
+    .breadcrumb { margin: 0 0 34px; font-size: 11px; color: var(--muted); }
+    .breadcrumb span { padding-inline: 7px; color: #9b9f90; }
+    .item-kind { margin: 0 0 12px; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #63705b; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 4.2vw, 58px); font-weight: 400; line-height: 1.05; letter-spacing: -.055em; }
+    .price { display: flex; align-items: baseline; gap: 12px; margin: 20px 0 0; }
+    .price strong { font-size: 24px; font-weight: 500; letter-spacing: -.05em; }
+    .price span { color: var(--muted); font-size: 11px; }
+    .description { max-width: 32ch; margin: 23px 0 24px; font-size: 14px; line-height: 1.75; color: #5b6256; }
+    .finish { display: flex; gap: 9px; align-items: center; margin-bottom: 25px; font-size: 12px; }
+    .swatch { display: inline-block; height: 16px; width: 16px; border-radius: 50%; background: #a65e3b; box-shadow: inset 0 0 0 1px #00000015; }
+    .product-button {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      min-height: 52px; width: 100%; padding: 15px 19px;
+      color: #fff; background: var(--green); border: 1px solid var(--green); border-radius: 3px;
+      cursor: pointer; font-size: 13px;
+    }
+    .product-button:hover { background: #293e29; }
+    .demo-note { margin: 10px 0 0; font-size: 10px; color: var(--muted); line-height: 1.6; }
+    .action-feedback { min-height: 18px; margin: 7px 0 0; font-size: 11px; line-height: 1.5; color: #44573c; }
+    .details { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: auto 0 0; padding-top: 21px; border-top: 1px solid #e1e3d8; }
+    .details dt { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .details dd { margin: 7px 0 0; font-size: 12px; }
+    .explanation {
+      display: grid; grid-template-columns: .7fr 1.3fr; gap: 42px;
+      padding-block: 28px 32px; border-bottom: 1px solid var(--line);
+    }
+    .explanation h2 { margin: 0 0 9px; font-size: 14px; font-weight: 600; letter-spacing: -.02em; }
+    .explanation p { margin: 0; max-width: 66ch; font-size: 12px; line-height: 1.8; color: var(--muted); }
+    .scope-label { display: inline-block; margin-top: 5px; font-size: 10px; color: var(--muted); }
+    .bug-hint { display: none; margin: 12px 0 0; color: #80512e; font-size: 12px; line-height: 1.6; }
+    body[data-mode="before"] .bug-hint { display: block; }
+    footer { display: flex; justify-content: space-between; gap: 18px; padding-block: 20px 25px; font-size: 10px; line-height: 1.7; color: var(--muted); }
+    footer a { text-underline-offset: 3px; }
+    /* The intentionally broken version: a desktop-only fixed-width card. */
+    body[data-mode="before"] .product { width: 960px; min-width: 960px; grid-template-columns: 500px 460px; }
+    @media (max-width: 760px) {
+      .shell { width: calc(100% - 40px); }
+      .masthead { padding-block: 20px; }
+      .signature { gap: 9px; }
+      .signature strong { font-size: 12px; }
+      .signature span { display: none; }
+      .edition { max-width: 106px; font-size: 10px; line-height: 1.6; }
+      .study-bar { align-items: flex-start; flex-direction: column; gap: 18px; padding-top: 27px; }
+      .study-title { font-size: 22px; }
+      .switcher { width: 100%; }
+      .mode-button { flex: 1; min-width: 0; }
+      .viewport-meta { align-items: flex-start; line-height: 1.5; }
+      .viewport-meta > span:last-child { text-align: right; }
+      body[data-mode="after"] .product { grid-template-columns: minmax(0, 1fr); }
+      .product-visual { min-height: 0; padding: 34px 24px 22px; }
+      .lamp-art { max-width: 390px; }
+      .visual-label { top: 20px; left: 22px; font-size: 9px; }
+      .visual-number { bottom: 17px; right: 20px; font-size: 9px; }
+      .product-copy { padding: 28px 25px 27px; }
+      .breadcrumb { margin-bottom: 25px; }
+      h1 { font-size: 48px; }
+      .description { max-width: 38ch; margin-block: 19px 21px; }
+      .details { margin-top: 13px; }
+      .explanation { grid-template-columns: minmax(0, 1fr); gap: 17px; padding-block: 24px; }
+      footer { flex-direction: column; gap: 8px; }
+      body[data-mode="before"] .product-visual { min-height: 490px; padding: 36px; }
+      body[data-mode="before"] .product-copy { padding: 47px 46px 34px; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .mode-button, .product-button { transition: background-color 120ms ease; }
+    }
+  </style>
+</head>
+<body data-mode="after">
+  <a class="skip-link" href="#demo">Skip to the demo</a>
+  <header class="masthead shell">
+    <a class="signature" href="#demo" aria-label="Fieldnote objects, original concept demo">
+      <svg class="mark" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+        <path d="M5 25V5h20M5 15h15M15 5v20" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M20 20h5v5h-5z" fill="currentColor"/>
+      </svg>
+      <strong>FIELDNOTE</strong><span>OBJECTS</span>
+    </a>
+    <div class="edition">Original concept<br>Layout study No. 01</div>
+  </header>
+
+  <main class="shell" id="demo">
+    <div class="study-bar">
+      <div>
+        <p class="eyebrow">One page. One layout fix.</p>
+        <p class="study-title">A little room <span>makes a difference.</span></p>
+      </div>
+      <div class="switcher" role="group" aria-label="Compare the responsive layout">
+        <button class="mode-button" type="button" data-mode="before" aria-pressed="false" aria-controls="product-stage">Before</button>
+        <button class="mode-button" type="button" data-mode="after" aria-pressed="true" aria-controls="product-stage">After</button>
+      </div>
+    </div>
+
+    <div class="viewport-meta">
+      <span class="status" id="layout-status" role="status">After · responsive layout</span>
+      <span id="viewport-size">Resize to compare</span>
+    </div>
+
+    <section class="demo-stage" id="product-stage" tabindex="0" aria-label="Product layout preview. Before mode may scroll horizontally on narrow screens.">
+      <article class="product" aria-labelledby="product-title">
+        <div class="product-visual">
+          <span class="visual-label">An object for quieter corners</span>
+          <svg class="lamp-art" viewBox="0 0 500 460" role="img" aria-labelledby="lamp-title lamp-description">
+            <title id="lamp-title">Original illustration of a terracotta desk lamp</title>
+            <desc id="lamp-description">A rounded mushroom shade on a slender stem and circular base, drawn over a soft green background. This is a fictional product.</desc>
+            <defs>
+              <linearGradient id="shade" x1="0" x2="1" y1="0" y2=".4">
+                <stop stop-color="#bd7953"/><stop offset=".36" stop-color="#c98b64"/>
+                <stop offset=".76" stop-color="#a65f3c"/><stop offset="1" stop-color="#87472f"/>
+              </linearGradient>
+              <linearGradient id="stem" x1="0" x2="1">
+                <stop stop-color="#a05d40"/><stop offset=".4" stop-color="#c78b63"/><stop offset="1" stop-color="#85472f"/>
+              </linearGradient>
+              <linearGradient id="base" x1="0" y1="0" x2=".8" y2="1">
+                <stop stop-color="#c18b66"/><stop offset=".52" stop-color="#ab6c49"/><stop offset="1" stop-color="#81452e"/>
+              </linearGradient>
+              <radialGradient id="pool">
+                <stop stop-color="#fff3c6" stop-opacity=".6"/><stop offset="1" stop-color="#fff3c6" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="soft"><feGaussianBlur stdDeviation="8"/></filter>
+            </defs>
+            <circle cx="255" cy="225" r="166" fill="#dce0cf"/>
+            <path d="M32 367H468" stroke="#d0d5c3" stroke-width="1"/>
+            <ellipse cx="273" cy="382" rx="113" ry="14" fill="#5e674c" opacity=".18" filter="url(#soft)"/>
+            <ellipse cx="250" cy="340" rx="142" ry="50" fill="url(#pool)"/>
+            <path d="M294 375c47 4 43 18 80 18h32" fill="none" stroke="#72715e" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M173 360c0-17 34-30 77-30s77 13 77 30v9c0 16-34 29-77 29s-77-13-77-29z" fill="url(#base)"/>
+            <ellipse cx="250" cy="357" rx="77" ry="27" fill="#bd8158"/>
+            <ellipse cx="250" cy="355" rx="61" ry="19" fill="#c48b63" opacity=".6"/>
+            <path d="M237 206h26v146c0 5-6 8-13 8s-13-3-13-8z" fill="url(#stem)"/>
+            <path d="M250 80c-62 0-113 50-119 120l-3 12c0 15 55 27 122 27s122-12 122-27l-3-12C363 130 312 80 250 80z" fill="url(#shade)"/>
+            <path d="M144 193c10-55 46-94 91-102" fill="none" stroke="#e1ac83" stroke-width="3" opacity=".35" stroke-linecap="round"/>
+            <ellipse cx="250" cy="212" rx="122" ry="22" fill="#865039"/>
+            <ellipse cx="250" cy="211" rx="111" ry="15" fill="#e6bf8e"/>
+            <ellipse cx="250" cy="210" rx="95" ry="9" fill="#f1d5a8"/>
+            <path d="M129 211c15 14 67 23 121 23s108-9 121-23" fill="none" stroke="#9a5839" stroke-width="3"/>
+          </svg>
+          <span class="visual-number">ARC / CLAY / 001</span>
+        </div>
+
+        <div class="product-copy">
+          <p class="breadcrumb">Objects <span>/</span> Lighting <span>/</span> Arc</p>
+          <p class="item-kind">Fictional studio collection</p>
+          <h1 id="product-title">Arc task light</h1>
+          <p class="price"><strong>$68</strong><span>Illustrative price</span></p>
+          <p class="description">A soft curve, a warm finish, a place to pause. A simple desk light imagined for the corner you call your own.</p>
+          <div class="finish"><span class="swatch" aria-hidden="true"></span><span>Finish: clay</span></div>
+          <button class="product-button" type="button" id="preview-button">Preview this item <span aria-hidden="true">↗</span></button>
+          <p class="demo-note">Concept product only. No checkout or payment.</p>
+          <p class="action-feedback" id="action-feedback" role="status"></p>
+          <dl class="details">
+            <div><dt>Concept size</dt><dd>28 × 18 cm</dd></div>
+            <div><dt>Illustration</dt><dd>Original vector artwork</dd></div>
+          </dl>
+        </div>
+      </article>
+    </section>
+
+    <p class="bug-hint" id="bug-hint">The original card stays 960px wide. On a phone, scroll the preview sideways to reach the product details. Switch to After to fix it.</p>
+    <section class="explanation" id="notes" aria-labelledby="fix-title">
+      <div>
+        <h2 id="fix-title">Same content. Better fit.</h2>
+        <span class="scope-label">A focused frontend repair</span>
+      </div>
+      <p>Before keeps a fixed desktop width. After uses a flexible two-column grid, then stacks the image and details on smaller screens. The fix keeps the text, artwork and button inside the available space.</p>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <span>Original demonstration · synthetic product · no client work claimed</span>
+    <a href="#demo">Back to the comparison ↑</a>
+  </footer>
+
+  <script>
+    (() => {
+      const stage = document.getElementById('product-stage');
+      const status = document.getElementById('layout-status');
+      const size = document.getElementById('viewport-size');
+      const buttons = document.querySelectorAll('.mode-button');
+
+      function updateReadout() {
+        const width = Math.round(stage.clientWidth);
+        const overflow = stage.scrollWidth > stage.clientWidth + 1;
+        const label = document.body.dataset.mode === 'after' ? 'After' : 'Before';
+        status.textContent = label + (overflow ? ' · horizontal overflow' : ' · fits the preview');
+        size.textContent = width + 'px preview';
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          document.body.dataset.mode = button.dataset.mode;
+          buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+          stage.scrollLeft = 0;
+          updateReadout();
+        });
+      });
+
+      document.getElementById('preview-button').addEventListener('click', () => {
+        document.getElementById('action-feedback').textContent = 'Concept preview only. Nothing has been ordered.';
+      });
+
+      window.addEventListener('resize', updateReadout);
+      updateReadout();
+    })();
+  </script>
+</body>
+</html>

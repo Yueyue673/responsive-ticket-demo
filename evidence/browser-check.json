@@ -1,0 +1,84 @@
+{
+  "checked_at_utc": "2026-10-18T14:15:47.423Z",
+  "source_sha256": "3effa83038c990c022df4812e56269a63b5dfd4e5a650d63cd3bf336fc896a08",
+  "browser": "Codex in-app browser",
+  "method": "Rendered the original sample through a temporary localhost-only server; read actual DOM geometry and used real button/keyboard actions.",
+  "checks": [
+    {
+      "check": "390-after",
+      "columns": "333px",
+      "contentWidth": 333,
+      "mode": "after",
+      "pageWidth": 375,
+      "previewWidth": 333,
+      "viewport": 390
+    },
+    {
+      "check": "390-before-enter",
+      "contentWidth": 960,
+      "mode": "before",
+      "previewWidth": 333,
+      "status": "Before · horizontal overflow"
+    },
+    {
+      "check": "390-after-space",
+      "contentWidth": 333,
+      "mode": "after",
+      "previewWidth": 333,
+      "scrollLeft": 0,
+      "status": "After · fits the preview"
+    },
+    {
+      "check": "preview-action",
+      "text": "Concept preview only. Nothing has been ordered."
+    },
+    {
+      "check": "keyboard-focus",
+      "label": "After",
+      "outlineWidth": "3px",
+      "visible": true
+    },
+    {
+      "check": "responsive-width",
+      "columns": "263px",
+      "contentWidth": 263,
+      "mode": "after",
+      "pageWidth": 305,
+      "previewWidth": 263,
+      "viewport": 320
+    },
+    {
+      "check": "responsive-width",
+      "columns": "703px",
+      "contentWidth": 703,
+      "mode": "after",
+      "pageWidth": 745,
+      "previewWidth": 703,
+      "viewport": 760
+    },
+    {
+      "check": "responsive-width",
+      "columns": "348.391px 322.609px",
+      "contentWidth": 671,
+      "mode": "after",
+      "pageWidth": 753,
+      "previewWidth": 671,
+      "viewport": 768
+    },
+    {
+      "check": "responsive-width",
+      "columns": "580.5px 537.5px",
+      "contentWidth": 1118,
+      "mode": "after",
+      "pageWidth": 1265,
+      "previewWidth": 1118,
+      "viewport": 1280
+    }
+  ],
+  "screenshots": [
+    "desktop-after.jpg",
+    "mobile-before.jpg",
+    "mobile-after.jpg"
+  ],
+  "limits": "One browser engine only; no WordPress/Shopify runtime or client website tested. This is a synthetic standalone frontend sample."
+}

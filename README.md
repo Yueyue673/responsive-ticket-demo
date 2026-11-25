@@ -1,46 +1,47 @@
-# Responsive product layout demo
+# 商品卡窄屏排版
 
-An original, self-contained frontend repair demonstration. The brand, lamp, price and dimensions are fictional. The inline SVG is original artwork. This is a sample, not a client project, customer result or functioning shop.
+打开这一页，可以对比同一张商品卡在改前和改后的排版。改前卡片固定 960px 宽，窄屏上图片会把说明和按钮挤到预览外面，需要左右滑动才能看完。改后用弹性网格，小于 760px 时改成单列，内容会收进预览框里。
 
-**[Try the live Before / After demo](https://yueyue673.github.io/responsive-ticket-demo/)**
+**[打开在线对比页](https://yueyue673.github.io/responsive-ticket-demo/)**
 
-You can also open `index.html` locally. No installation, build, server or account is needed.
+也可以直接打开 `index.html`。不用安装，不用服务器，不用账号。
 
-![Rendered desktop layout](evidence/desktop-after.jpg)
+![改后的桌面排版](evidence/desktop-after.jpg)
 
-## What was checked
+## 怎么对比
 
-The page was rendered in the Codex in-app browser through a temporary local server. At a 390px viewport, **Before** produced a 960px-wide card inside a 333px preview. **After** fit the same preview without horizontal overflow. The repaired layout also fit at 320, 760, 768 and 1280px viewport widths.
+页面上的 **Before / After** 会切换同一张卡片的样式。Before 会在预览里横向溢出，外面的页面和切换按钮仍可正常使用。打开后默认是 After。
 
-Enter and Space changed the selected layout, Tab produced a visible 3px focus outline, and the item button displayed its concept-only confirmation. These are checks of this standalone sample; no WordPress or Shopify installation was tested.
+1. 把窗口或预览调到约 390px 宽，点 Before。状态会提示横向溢出。左右滑动预览，才能看到商品说明。
+2. 再点 After。图片和说明上下排，按钮也能看见，状态提示内容已放下。预览会回到最左边。
+3. 再试试 320px、760px、768px 和桌面宽度。After 不应让页面或预览横向溢出。桌面宽度下是两列。
+4. 用 Tab、Enter、空格操作切换按钮和商品按钮。焦点有 3px 的可见描边；选中的对比按钮带 `aria-pressed`。页头有跳到对比的链接。
+5. 点 **Preview this item**，页面会提示没有下单。这里没有结账。
 
-- [Actual geometry and source fingerprint](evidence/browser-check.json)
-- [Mobile before](evidence/mobile-before.jpg) / [mobile after](evidence/mobile-after.jpg)
+## 实际量过的结果
 
-## The ticket
+曾在 Codex 内置浏览器里，用临时本地服务打开这一页。390px 视口时，Before 在 333px 的预览里出现一张 960px 宽的卡片；After 能放下，没有横向溢出。After 在 320、760、768、1280px 视口也能放下。
 
-**Problem:** a product card has a fixed 960px desktop width. On a narrow screen, the image pushes the product details and action outside the visible preview.
+Enter 和空格可以切换对比，Tab 能看到 3px 焦点描边，商品按钮会显示并未下单的提示。
 
-**Fix:** a fluid grid with `minmax(0, …)` tracks and `min-width: 0` children. Below 760px the card becomes a single column. The artwork scales to its container.
+- [测量数据和源文件指纹](evidence/browser-check.json)
+- [手机改前](evidence/mobile-before.jpg) / [手机改后](evidence/mobile-after.jpg)
 
-The **Before / After** buttons switch the actual layout rules on the same product card. Before intentionally overflows inside a horizontally scrollable preview; the outer page and comparison controls stay usable. After is the default.
+以上是在一个浏览器引擎里核对的。没有接到 WordPress 或 Shopify 上试过，其他浏览器也还没测。
 
-## Browser acceptance checks
+## 改了什么
 
-1. At a 390px viewport, choose **Before**. The status reports horizontal overflow. Scroll the product preview horizontally to see the details.
-2. Choose **After**. The image and details stack, the entire action fits, and the status reports that the content fits. The preview returns to its left edge.
-3. Repeat at 320px, 760px, 768px and a desktop width. After should not create horizontal page or preview overflow. At desktop widths, it has two columns.
-4. Use Tab, Enter and Space to operate the comparison and item button. Focus is visible; the selected comparison button exposes `aria-pressed`. A skip link is available at the beginning of the page.
-5. Select **Preview this item**. An inline message confirms that nothing has been ordered. There is no checkout.
+问题：商品卡写死 960px 宽。窄屏上图片把说明和按钮推到预览外面。
 
-The status and preview width are measured from the current rendered container. The checks above were run in one browser engine; other browsers and an actual store integration remain outside this sample.
+改法：用带 `minmax(0, …)` 的弹性网格，子项加 `min-width: 0`。小于 760px 时改成单列，插画随容器缩放。
 
-## Boundaries
+样式和脚本都写在 `index.html` 里。没有外部字体、图片或库，也不会发网络请求。卡片里的灯、价格和尺寸是示例。
 
-- Two files; native HTML, CSS and JavaScript only.
-- No external fonts, images, libraries, services or network requests.
-- No tracking, cookies, local storage, personal data, email addresses or payment details.
-- No ratings, sales claims, testimonials or fabricated commercial history.
-- No ordering, payment, backend, inventory or ecommerce platform.
+<details>
+<summary>English</summary>
 
-This repository contains the complete standalone sample and its verification evidence. There is no hosted shop or checkout service.
+This page compares the same product card before and after a layout fix. Before, the card is a fixed 960px wide and overflows a narrow preview. After, a fluid grid stacks the image and details below 760px.
+
+Open the [live comparison](https://yueyue673.github.io/responsive-ticket-demo/) or the local `index.html`. No install or server is needed. Use the Before / After buttons, then try 320, 390, 760, 768 and 1280px widths. At a 390px viewport, Before produced a 960px-wide card inside a 333px preview; After fit without horizontal overflow.
+
+</details>

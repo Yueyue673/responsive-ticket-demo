@@ -1,128 +1,125 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="An original, offline responsive layout demonstration with a reproducible mobile overflow bug and its fix. All product details are fictional.">
-  <title>Arc — a responsive layout study</title>
+  <meta name="description" content="同一张虚构商品卡片。改前在窄屏上会超出预览，改后能放进来。不能下单。">
+  <title>窄屏上的商品卡片</title>
   <style>
     :root {
-      --ink: #252b23;
-      --muted: #62685c;
-      --paper: #f1f0e9;
-      --line: #d9dbd0;
-      --green: #384b36;
-      --warm: #c18865;
-      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      --ink: #243d34;
+      --muted: #61746a;
+      --paper: #f7f5ef;
+      --card: #fffef9;
+      --line: #dce2d7;
+      --green: #315e4b;
+      --wash: #e9efe5;
+      --accent: #8d7040;
+      --clay: #a65e3b;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
       color: var(--ink);
       background: var(--paper);
       font-synthesis: none;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; }
+    body { margin: 0; font-size: 16px; line-height: 1.7; }
     button, a { -webkit-tap-highlight-color: transparent; }
     button { font: inherit; }
     button, a { touch-action: manipulation; }
     button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
-      outline: 3px solid #28624d;
-      outline-offset: 5px;
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
     }
-    a { color: inherit; }
+    a { color: var(--green); text-underline-offset: 3px; }
     .skip-link {
       position: fixed; top: 8px; left: 8px; z-index: 10;
-      padding: 12px 16px; background: #fff; transform: translateY(-160%);
+      padding: 10px 14px; background: var(--card); color: var(--ink);
+      border: 1px solid var(--line); border-radius: 8px; text-decoration: none;
+      transform: translateY(-160%);
     }
     .skip-link:focus { transform: translateY(0); }
     .shell { width: min(1120px, calc(100% - 80px)); margin-inline: auto; }
     .masthead {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 20px; padding-block: 27px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 16px; padding-block: 22px 16px; border-bottom: 1px solid var(--line);
     }
-    .signature { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .mark { width: 29px; height: 29px; flex: none; }
-    .signature strong { font-size: 15px; font-weight: 650; letter-spacing: .15em; }
-    .signature span { color: var(--muted); font-size: 11px; letter-spacing: .17em; }
-    .edition { color: var(--muted); font-size: 12px; letter-spacing: .04em; text-align: right; }
+    .site-name { color: var(--ink); font-size: 16px; font-weight: 650; text-decoration: none; }
+    .masthead p { margin: 0; color: var(--muted); font-size: 13px; }
     .study-bar {
-      display: flex; align-items: center; justify-content: space-between; gap: 28px;
-      padding-block: 30px 23px;
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+      padding-block: 28px 16px;
     }
-    .eyebrow { margin: 0 0 8px; font-size: 10px; font-weight: 650; letter-spacing: .16em; text-transform: uppercase; }
-    .study-title { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -.035em; }
-    .study-title span { color: var(--muted); }
-    .switcher { display: flex; flex-shrink: 0; padding: 4px; gap: 4px; border: 1px solid #d3d6c9; border-radius: 40px; }
+    .kicker { margin: 0 0 4px; font-size: 13px; color: var(--muted); }
+    .study-title { margin: 0; font-size: 22px; font-weight: 650; line-height: 1.45; }
+    .switcher { display: flex; flex-shrink: 0; gap: 8px; }
     .mode-button {
-      min-height: 44px; min-width: 94px; padding: 10px 20px;
-      border: 0; border-radius: 32px; color: var(--muted); background: transparent; cursor: pointer;
-      font-size: 13px; font-weight: 600;
+      min-height: 44px; min-width: 88px; padding: 8px 16px;
+      border: 1px solid var(--line); border-radius: 8px;
+      color: var(--ink); background: var(--card); cursor: pointer;
+      font-size: 15px;
     }
-    .mode-button[aria-pressed="true"] { background: var(--green); color: #fff; box-shadow: 0 2px 4px #1f30231a; }
-    .mode-button:hover:not([aria-pressed="true"]) { background: #e2e5d9; color: var(--ink); }
-    .viewport-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; font-size: 11px; color: var(--muted); }
-    .status { display: flex; align-items: center; gap: 7px; }
-    .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #63805c; flex: none; }
-    body[data-mode="before"] .status::before { background: #b16c40; }
+    .mode-button[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+    .mode-button:hover:not([aria-pressed="true"]) { background: var(--wash); }
+    .viewport-meta {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin-bottom: 10px; font-size: 13px; color: var(--muted);
+    }
+    .status { display: flex; align-items: center; gap: 8px; }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #5d7a62; flex: none; }
+    body[data-mode="before"] .status::before { background: #a56b45; }
     .demo-stage {
       overflow-x: auto; overscroll-behavior-x: contain;
-      border: 1px solid var(--line); border-radius: 5px; background: #fbfbf6;
-      scrollbar-color: #86927b #e4e7dd;
+      border: 1px solid var(--line); border-radius: 8px; background: var(--card);
+      scrollbar-color: #9aab9a var(--wash);
     }
     .product { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); width: 100%; }
     .product > * { min-width: 0; }
     .product-visual {
       position: relative; display: flex; align-items: center; justify-content: center;
       min-height: 490px; padding: 36px; overflow: hidden;
-      background: #e5e7db;
+      background: var(--wash);
     }
-    .visual-label { position: absolute; top: 24px; left: 26px; z-index: 1; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #4d5c45; }
-    .visual-number { position: absolute; right: 24px; bottom: 22px; font-size: 10px; color: #62705a; letter-spacing: .1em; }
+    .visual-label { position: absolute; top: 24px; left: 26px; z-index: 1; font-size: 13px; color: #4d5c45; }
+    .visual-number { position: absolute; right: 24px; bottom: 22px; font-size: 12px; color: #62705a; }
     .lamp-art { display: block; width: 100%; max-width: 455px; height: auto; }
     .product-copy { padding: 47px 46px 34px; display: flex; flex-direction: column; }
-    .breadcrumb { margin: 0 0 34px; font-size: 11px; color: var(--muted); }
-    .breadcrumb span { padding-inline: 7px; color: #9b9f90; }
-    .item-kind { margin: 0 0 12px; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #63705b; }
-    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 4.2vw, 58px); font-weight: 400; line-height: 1.05; letter-spacing: -.055em; }
-    .price { display: flex; align-items: baseline; gap: 12px; margin: 20px 0 0; }
-    .price strong { font-size: 24px; font-weight: 500; letter-spacing: -.05em; }
-    .price span { color: var(--muted); font-size: 11px; }
-    .description { max-width: 32ch; margin: 23px 0 24px; font-size: 14px; line-height: 1.75; color: #5b6256; }
-    .finish { display: flex; gap: 9px; align-items: center; margin-bottom: 25px; font-size: 12px; }
-    .swatch { display: inline-block; height: 16px; width: 16px; border-radius: 50%; background: #a65e3b; box-shadow: inset 0 0 0 1px #00000015; }
+    .breadcrumb { margin: 0 0 28px; font-size: 13px; color: var(--muted); }
+    .breadcrumb span { padding-inline: 7px; color: #9aa394; }
+    h1 { margin: 0; font-size: clamp(36px, 4vw, 48px); font-weight: 650; line-height: 1.15; }
+    .price { margin: 16px 0 0; }
+    .price strong { font-size: 24px; font-weight: 600; }
+    .description { max-width: 36ch; margin: 18px 0 22px; font-size: 15px; line-height: 1.7; color: #4e5a50; }
+    .finish { display: flex; gap: 8px; align-items: center; margin-bottom: 22px; font-size: 14px; }
+    .swatch { display: inline-block; height: 16px; width: 16px; border-radius: 50%; background: var(--clay); box-shadow: inset 0 0 0 1px #00000015; }
     .product-button {
       display: flex; justify-content: space-between; align-items: center; gap: 16px;
-      min-height: 52px; width: 100%; padding: 15px 19px;
-      color: #fff; background: var(--green); border: 1px solid var(--green); border-radius: 3px;
-      cursor: pointer; font-size: 13px;
+      min-height: 48px; width: 100%; padding: 12px 16px;
+      color: #fff; background: var(--green); border: 1px solid var(--green); border-radius: 8px;
+      cursor: pointer; font-size: 15px;
     }
-    .product-button:hover { background: #293e29; }
-    .demo-note { margin: 10px 0 0; font-size: 10px; color: var(--muted); line-height: 1.6; }
-    .action-feedback { min-height: 18px; margin: 7px 0 0; font-size: 11px; line-height: 1.5; color: #44573c; }
-    .details { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: auto 0 0; padding-top: 21px; border-top: 1px solid #e1e3d8; }
-    .details dt { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-    .details dd { margin: 7px 0 0; font-size: 12px; }
-    .explanation {
-      display: grid; grid-template-columns: .7fr 1.3fr; gap: 42px;
-      padding-block: 28px 32px; border-bottom: 1px solid var(--line);
-    }
-    .explanation h2 { margin: 0 0 9px; font-size: 14px; font-weight: 600; letter-spacing: -.02em; }
-    .explanation p { margin: 0; max-width: 66ch; font-size: 12px; line-height: 1.8; color: var(--muted); }
-    .scope-label { display: inline-block; margin-top: 5px; font-size: 10px; color: var(--muted); }
-    .bug-hint { display: none; margin: 12px 0 0; color: #80512e; font-size: 12px; line-height: 1.6; }
+    .product-button:hover { background: #254c3b; }
+    .demo-note { margin: 10px 0 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .action-feedback { min-height: 22px; margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: #315e4b; }
+    .details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: auto 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
+    .details dt { font-size: 12px; color: var(--muted); }
+    .details dd { margin: 4px 0 0; font-size: 14px; }
+    .explanation { padding-block: 26px 22px; border-bottom: 1px solid var(--line); }
+    .explanation h2 { margin: 0 0 8px; font-size: 16px; font-weight: 650; line-height: 1.5; }
+    .explanation p { margin: 0; max-width: 62ch; font-size: 14px; line-height: 1.75; color: var(--muted); }
+    .bug-hint { display: none; margin: 12px 0 0; color: #80512e; font-size: 14px; line-height: 1.7; }
     body[data-mode="before"] .bug-hint { display: block; }
-    footer { display: flex; justify-content: space-between; gap: 18px; padding-block: 20px 25px; font-size: 10px; line-height: 1.7; color: var(--muted); }
-    footer a { text-underline-offset: 3px; }
+    footer {
+      display: flex; justify-content: space-between; gap: 16px;
+      padding-block: 16px 28px; font-size: 13px; line-height: 1.7; color: var(--muted);
+    }
     /* The intentionally broken version: a desktop-only fixed-width card. */
     body[data-mode="before"] .product { width: 960px; min-width: 960px; grid-template-columns: 500px 460px; }
     @media (max-width: 760px) {
       .shell { width: calc(100% - 40px); }
-      .masthead { padding-block: 20px; }
-      .signature { gap: 9px; }
-      .signature strong { font-size: 12px; }
-      .signature span { display: none; }
-      .edition { max-width: 106px; font-size: 10px; line-height: 1.6; }
-      .study-bar { align-items: flex-start; flex-direction: column; gap: 18px; padding-top: 27px; }
-      .study-title { font-size: 22px; }
+      .masthead { padding-block: 18px 14px; }
+      .study-bar { align-items: stretch; flex-direction: column; gap: 14px; padding-top: 22px; }
+      .study-title { font-size: 20px; }
       .switcher { width: 100%; }
       .mode-button { flex: 1; min-width: 0; }
       .viewport-meta { align-items: flex-start; line-height: 1.5; }
@@ -130,14 +127,14 @@
       body[data-mode="after"] .product { grid-template-columns: minmax(0, 1fr); }
       .product-visual { min-height: 0; padding: 34px 24px 22px; }
       .lamp-art { max-width: 390px; }
-      .visual-label { top: 20px; left: 22px; font-size: 9px; }
-      .visual-number { bottom: 17px; right: 20px; font-size: 9px; }
+      .visual-label { top: 20px; left: 22px; }
+      .visual-number { bottom: 17px; right: 20px; }
       .product-copy { padding: 28px 25px 27px; }
-      .breadcrumb { margin-bottom: 25px; }
-      h1 { font-size: 48px; }
-      .description { max-width: 38ch; margin-block: 19px 21px; }
-      .details { margin-top: 13px; }
-      .explanation { grid-template-columns: minmax(0, 1fr); gap: 17px; padding-block: 24px; }
+      .breadcrumb { margin-bottom: 22px; }
+      h1 { font-size: 40px; }
+      .description { max-width: 38ch; margin-block: 16px 18px; }
+      .details { margin-top: 16px; }
+      .explanation { padding-block: 22px 18px; }
       footer { flex-direction: column; gap: 8px; }
       body[data-mode="before"] .product-visual { min-height: 490px; padding: 36px; }
       body[data-mode="before"] .product-copy { padding: 47px 46px 34px; }
@@ -148,42 +145,36 @@
   </style>
 </head>
 <body data-mode="after">
-  <a class="skip-link" href="#demo">Skip to the demo</a>
+  <a class="skip-link" href="#demo">跳到对比</a>
   <header class="masthead shell">
-    <a class="signature" href="#demo" aria-label="Fieldnote objects, original concept demo">
-      <svg class="mark" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
-        <path d="M5 25V5h20M5 15h15M15 5v20" fill="none" stroke="currentColor" stroke-width="1.4"/>
-        <path d="M20 20h5v5h-5z" fill="currentColor"/>
-      </svg>
-      <strong>FIELDNOTE</strong><span>OBJECTS</span>
-    </a>
-    <div class="edition">Original concept<br>Layout study No. 01</div>
+    <a class="site-name" href="#demo">窄屏排版</a>
+    <p>虚构示例</p>
   </header>
 
   <main class="shell" id="demo">
     <div class="study-bar">
       <div>
-        <p class="eyebrow">One page. One layout fix.</p>
-        <p class="study-title">A little room <span>makes a difference.</span></p>
+        <p class="kicker">同一张卡片</p>
+        <p class="study-title">窄屏时放不放得下。</p>
       </div>
-      <div class="switcher" role="group" aria-label="Compare the responsive layout">
-        <button class="mode-button" type="button" data-mode="before" aria-pressed="false" aria-controls="product-stage">Before</button>
-        <button class="mode-button" type="button" data-mode="after" aria-pressed="true" aria-controls="product-stage">After</button>
+      <div class="switcher" role="group" aria-label="切换改前和改后">
+        <button class="mode-button" type="button" data-mode="before" aria-pressed="false" aria-controls="product-stage">改前</button>
+        <button class="mode-button" type="button" data-mode="after" aria-pressed="true" aria-controls="product-stage">改后</button>
       </div>
     </div>
 
     <div class="viewport-meta">
-      <span class="status" id="layout-status" role="status">After · responsive layout</span>
-      <span id="viewport-size">Resize to compare</span>
+      <span class="status" id="layout-status" role="status">改后 · 能放进预览</span>
+      <span id="viewport-size">预览宽度</span>
     </div>
 
-    <section class="demo-stage" id="product-stage" tabindex="0" aria-label="Product layout preview. Before mode may scroll horizontally on narrow screens.">
+    <section class="demo-stage" id="product-stage" tabindex="0" aria-label="商品卡片预览。改前在窄屏上可以左右滑动。">
       <article class="product" aria-labelledby="product-title">
         <div class="product-visual">
-          <span class="visual-label">An object for quieter corners</span>
+          <span class="visual-label">Clay</span>
           <svg class="lamp-art" viewBox="0 0 500 460" role="img" aria-labelledby="lamp-title lamp-description">
-            <title id="lamp-title">Original illustration of a terracotta desk lamp</title>
-            <desc id="lamp-description">A rounded mushroom shade on a slender stem and circular base, drawn over a soft green background. This is a fictional product.</desc>
+            <title id="lamp-title">陶土台灯的线条图</title>
+            <desc id="lamp-description">圆灯罩、细灯杆和圆底座，画在浅绿色底上。这是虚构商品。</desc>
             <defs>
               <linearGradient id="shade" x1="0" x2="1" y1="0" y2=".4">
                 <stop stop-color="#bd7953"/><stop offset=".36" stop-color="#c98b64"/>
@@ -221,35 +212,31 @@
 
         <div class="product-copy">
           <p class="breadcrumb">Objects <span>/</span> Lighting <span>/</span> Arc</p>
-          <p class="item-kind">Fictional studio collection</p>
           <h1 id="product-title">Arc task light</h1>
-          <p class="price"><strong>$68</strong><span>Illustrative price</span></p>
-          <p class="description">A soft curve, a warm finish, a place to pause. A simple desk light imagined for the corner you call your own.</p>
+          <p class="price"><strong>$68</strong></p>
+          <p class="description">A small desk lamp with a rounded shade and a clay finish.</p>
           <div class="finish"><span class="swatch" aria-hidden="true"></span><span>Finish: clay</span></div>
           <button class="product-button" type="button" id="preview-button">Preview this item <span aria-hidden="true">↗</span></button>
-          <p class="demo-note">Concept product only. No checkout or payment.</p>
+          <p class="demo-note">虚构商品，不能购买。</p>
           <p class="action-feedback" id="action-feedback" role="status"></p>
           <dl class="details">
-            <div><dt>Concept size</dt><dd>28 × 18 cm</dd></div>
-            <div><dt>Illustration</dt><dd>Original vector artwork</dd></div>
+            <div><dt>Size</dt><dd>28 × 18 cm</dd></div>
+            <div><dt>Shade</dt><dd>terracotta</dd></div>
           </dl>
         </div>
       </article>
     </section>
 
-    <p class="bug-hint" id="bug-hint">The original card stays 960px wide. On a phone, scroll the preview sideways to reach the product details. Switch to After to fix it.</p>
+    <p class="bug-hint" id="bug-hint">这张卡片固定 960 像素宽。窄屏上可以左右滑动，才能看到右边的说明和按钮。</p>
     <section class="explanation" id="notes" aria-labelledby="fix-title">
-      <div>
-        <h2 id="fix-title">Same content. Better fit.</h2>
-        <span class="scope-label">A focused frontend repair</span>
-      </div>
-      <p>Before keeps a fixed desktop width. After uses a flexible two-column grid, then stacks the image and details on smaller screens. The fix keeps the text, artwork and button inside the available space.</p>
+      <h2 id="fix-title">差在哪里</h2>
+      <p>改前是固定 960 像素的桌面宽度，窄屏时要左右滑动，才能看到说明和按钮。改后用弹性网格，窄于 760 像素时图片和文字上下排列，内容留在预览里面。</p>
     </section>
   </main>
 
   <footer class="shell">
-    <span>Original demonstration · synthetic product · no client work claimed</span>
-    <a href="#demo">Back to the comparison ↑</a>
+    <span>虚构商品，不能下单。</span>
+    <a href="#demo">回到对比</a>
   </footer>
 
   <script>
@@ -262,9 +249,9 @@
       function updateReadout() {
         const width = Math.round(stage.clientWidth);
         const overflow = stage.scrollWidth > stage.clientWidth + 1;
-        const label = document.body.dataset.mode === 'after' ? 'After' : 'Before';
-        status.textContent = label + (overflow ? ' · horizontal overflow' : ' · fits the preview');
-        size.textContent = width + 'px preview';
+        const label = document.body.dataset.mode === 'after' ? '改后' : '改前';
+        status.textContent = label + (overflow ? ' · 左右滑才能看完' : ' · 能放进预览');
+        size.textContent = '预览宽 ' + width + 'px';
       }
 
       buttons.forEach(button => {
@@ -277,7 +264,7 @@
       });
 
       document.getElementById('preview-button').addEventListener('click', () => {
-        document.getElementById('action-feedback').textContent = 'Concept preview only. Nothing has been ordered.';
+        document.getElementById('action-feedback').textContent = '只是看一看，没有下单。';
       });
 
       window.addEventListener('resize', updateReadout);
